@@ -1,66 +1,66 @@
-# Sensitivity Analysis of Compound Poisson-Exponential Processes
+# Dynamics of Compound Poisson Processes: Simulation & Sensitivity
 
-## Project Overview
+![R](https://img.shields.io/badge/Language-R-blue)
+![Shiny](https://img.shields.io/badge/Framework-Shiny-blue)
+![Status](https://img.shields.io/badge/Status-Complete-green)
 
-This project explores the **Compound Poisson Process**, specifically the case where the jump sizes follow an Exponential distribution. This stochastic process is fundamental in fields such as **Actuarial Science (Cramér–Lundberg model)**, **Queuing Theory**.
+## Project Abstract
+This repository implements a stochastic simulation of a **Compound Poisson Process** where jump magnitudes are governed by an Exponential distribution. This model is a critical component in **Risk Management (Ruins Theory)** and **Operations Research (Queuing Systems)**.
 
-The repository contains a theoretical derivation of the process's distribution and an interactive **R Shiny application** that visualizes the process, demonstrates the Central Limit Theorem (CLT), and performs sensitivity analysis on the parameters.
+The project features a complete mathematical derivation of the process density and includes a robust **R Shiny Dashboard**. The application allows for real-time visualization of sample paths, validation of asymptotic behavior (Central Limit Theorem), and sensitivity analysis of model parameters.
 
-## Mathematical Framework
-
-The process is defined as:
+## Mathematical Model
+We model the cumulative process $S(t)$ as the random sum of random variables:
 
 $$S(t) = \sum_{i=1}^{N(t)} X_i$$
 
-Where:
-* **$N(t)$**: The counting process following a **Poisson distribution** with rate $\lambda$.
-* **$X_i$**: The jump sizes following an **Exponential distribution** with rate $\theta$.
+### System Components:
+* **Arrival Process $N(t)$:** Events occur according to a Poisson process with intensity $\lambda$.
+* **Magnitude Process $X_i$:** Each event carries a magnitude determined by an independent Exponential distribution with rate $\theta$.
 
-### Key Derivations
-Using the Moment Generating Function (MGF) method, we derived the MGF of $S(t)$ as:
+## Theoretical Foundation
+To establish the probability density function (PDF) of $S(t)$, we employ the **Law of Total Probability** by conditioning on the value of the counting process $N(t)$.
 
-$$M_{S(t)}(s) = \exp\left( \frac{\lambda t s}{\theta - s} \right)$$
+### 1. The Zero State
+If $N(t)=0$, the process remains at zero. This creates a discrete mass at the origin:
 
-The resulting probability density function (PDF) for $S(t) > 0$ is identified as a **Poisson-weighted mixture of Gamma distributions**, expressible using the Modified Bessel Function of the first kind ($I_1$):
+$$P(S(t) = 0) = e^{-\lambda t}$$
 
-$$f_{S(t)}(x) = e^{-\lambda t - \theta x} \sqrt{\frac{\lambda t \theta}{x}} I_1(2\sqrt{\lambda t \theta x})$$
+### 2. The Active State ($N(t) > 0$)
+For a fixed number of jumps $n$, the sum of $n$ Exponential($\theta$) variables follows a **Gamma Distribution** ($n, \theta$). The conditional density is:
 
-## Visualizations & Insights
+$$f_{S|n}(x) = \frac{\theta^n x^{n-1} e^{-\theta x}}{(n-1)!}$$
 
-### 1. Central Limit Theorem (CLT)
-The simulation demonstrates that as time $t$ increases, the distribution of $S(t)$ converges from a skewed mixture distribution to a symmetric **Normal Distribution**.
-* **Small $t$:** Highly skewed, significant probability mass at 0.
-* **Large $t$:** Bell-shaped curve centered at $\mu = \frac{\lambda t}{\theta}$.
+### 3. General Solution
+Summing over all possible values of $n$ yields the unconditional PDF, which converges to a form involving the **Modified Bessel Function ($I_1$)**:
 
-### 2. Sensitivity Analysis
-The R Shiny app allows users to toggle $\lambda$ (inter-arrival rate) and $\theta$ (jump size rate) to observe:
-* **Impact of $\lambda$:** Higher frequency leads to faster convergence to normality and higher variance.
-* **Impact of $\theta$:** Smaller $\theta$ implies larger jump sizes, leading to "heavier" tails and greater volatility.
+$$f_{S(t)}(x) = e^{-(\lambda t + \theta x)} \sqrt{\frac{\lambda t \theta}{x}} I_1(2\sqrt{\lambda t \theta x}), \quad x > 0$$
 
-## R Shiny Application
+## Simulation Results & Analysis
 
-The project includes an interactive dashboard to visualize these concepts dynamically.
+### 1. Asymptotic Convergence (CLT)
+The simulation tests the behavior of $S(t)$ across logarithmic time scales ($t=10, 100, 1000, 10000$).
 
-### Features
-* **Interactive Sliders:** Control Inter-arrival rate ($\lambda$) and Jump rate ($\theta$).
-* **Time Selector:** Visualize the process at $t=10, 100, 1000, 10000$.
-* **Dynamic Plotting:** Overlays the theoretical Normal approximation curve on top of the simulated histogram.
-* **Real-time Statistics:** Calculates and compares simulated vs. theoretical Mean and Variance.
+* **Observation:** At low $t$, the distribution is heavily right-skewed (Gamma-like). As $t \to \infty$, the distribution symmetrically aligns with a Gaussian curve.
+* **Validation:** The dashboard overlays a theoretical Normal curve ($\mathcal{N}(\mu, \sigma^2)$) which fits the data perfectly at high $t$, confirming the Central Limit Theorem.
 
-### How to Run Locally
+### 2. Parameter Sensitivity
+By manipulating $\lambda$ and $\theta$ in real-time, we observe:
 
-1.  **Clone the repository:**
-    ```bash
-    git clone the repository
-    ```
+* **Inter-arrival Rate ($\lambda$):** Acts as a "smoothing" agent. Higher $\lambda$ increases the event count, accelerating convergence to Normality.
+* **Jump Intensity ($\theta$):** Inverse driver of volatility. A lower $\theta$ results in a larger mean jump size ($1/\theta$), significantly expanding the tail risk of the distribution.
 
-2.  **Open R/RStudio** and install required packages:
-    ```r
-    install.packages(c("shiny", "ggplot2"))
-    ```
+## Interactive Dashboard (R Shiny)
+The accompanying R code deploys a reactive web application.
 
-3.  **Run the App:**
-    ```r
-    library(shiny)
-    runApp("rshinystoch.R")
+### Key Capabilities
+* **Path Simulation:** Generates stochastic "staircase" trajectories for $S(t)$.
+* **Distribution Analysis:** Dynamic histogram generation with theoretical overlays.
+* **Moment Matching:** Instant comparison of Simulated Moments vs. Theoretical Moments ($\mu = \lambda t / \theta$).
+
+## Deployment Instructions
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/yourusername/compound-poisson-sim.git](https://github.com/yourusername/compound-poisson-sim.git)
     ```
